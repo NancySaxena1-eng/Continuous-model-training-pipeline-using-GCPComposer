@@ -1,0 +1,25 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/testmlops-446623/bank-campaign-model', '.']
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/testmlops-446623/bank-campaign-model']
+
+- name: 'gcr.io/testmlops-446623/bank-campaign-model'
+  entrypoint: 'bash'
+  args:
+   - '-c'
+   - |
+      python -m pytest
+
+- name: 'gcr.io/cloud-builders/git'
+  args: ['clone', 'https://github.com/NancySaxena1-eng/Continuous-model-training-pipeline-using-GCPComposer.git']
+
+- name: 'gcr.io/cloud-builders/gsutil'
+  args: ['cp', 'Continuous-model-training-pipeline-using-GCPComposer/bank_campaign_model_training.py', 'gs://us-central1-mlops-airflow-bfa9c57d-bucket/dags']
+
+images:
+- 'gcr.io/testmlops-446623/bank-campaign-model'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
